@@ -5,7 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Torre de control del uso de licencias de Microsoft Copilot en Grupo INS: acceso al dashboard de licencias Premium.">
 <meta name="theme-color" content="#064350">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<script>
+  // Fija el tema antes del primer render para evitar parpadeo (FOUC).
+  // El botón de la interfaz permite alternarlo manualmente después.
+  (function(){
+    try{
+      var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    }catch(e){}
+  })();
+</script>
 <title>Torre de Control · Copilot</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,8 +35,22 @@
     --muted: #5B6B70;
     --line: #E1E9EA;
     --focus: #086378;
+    --heading: var(--teal-900);
     --radius-lg: 1.75rem;
     --radius-pill: 999px;
+  }
+
+  /* Modo oscuro — misma identidad INS, superficies e inversión de contraste */
+  :root[data-theme="dark"]{
+    --bg: #0B1520;
+    --surface: #10202A;
+    --text: #E7EEEE;
+    --muted: #93A8AE;
+    --line: #22333C;
+    --mint-bg: #123B34;
+    --teal-700: #5FE9CE;
+    --focus: #5FE9CE;
+    --heading: #EAF3F1;
   }
 
   *{ margin:0; padding:0; box-sizing:border-box; }
@@ -45,6 +69,7 @@
     flex-direction: column;
     overflow: hidden;
     -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 
   a{ -webkit-tap-highlight-color: transparent; }
@@ -66,6 +91,7 @@
     background: var(--surface);
     border-bottom: 1px solid var(--line);
     flex-shrink: 0;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
   }
   .topbar-inner{
     display:flex; align-items:center; justify-content:space-between;
@@ -79,6 +105,7 @@
     height: 30px;
     width: auto;
     flex-shrink:0;
+    transition: filter 0.25s ease;
   }
   .brand-divider{
     width:1px; height:28px;
@@ -93,15 +120,48 @@
     flex-shrink:0;
   }
   .brand-text{ line-height:1.25; }
-  .brand-text .eat{ font-weight:700; font-size:1.02rem; color: var(--teal-900); }
+  .brand-text .eat{ font-weight:700; font-size:1.02rem; color: var(--heading); }
   .brand-text .sub{ font-weight:400; font-size:0.8rem; color: var(--muted); }
+
+  :root[data-theme="dark"] .brand-logo{
+    filter: brightness(0) invert(1);
+  }
 
   .badge-ins{
     font-weight:600; font-size:0.8rem; color: var(--teal-700);
     background: var(--mint-bg);
     padding:8px 16px; border-radius: var(--radius-pill);
     white-space:nowrap;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
+
+  .topbar-actions{
+    display:flex; align-items:center; gap:12px;
+  }
+
+  /* Botón de modo oscuro/claro */
+  .theme-toggle{
+    display:flex; align-items:center; justify-content:center;
+    width:40px; height:40px;
+    border-radius:50%;
+    border: 2px solid var(--line);
+    background: var(--surface);
+    color: var(--teal-700);
+    cursor:pointer;
+    flex-shrink:0;
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease;
+  }
+  .theme-toggle:focus-visible{
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+  @media (hover:hover) and (pointer:fine){
+    .theme-toggle:hover{ border-color: var(--teal-700); }
+  }
+  .theme-toggle svg{ width:19px; height:19px; }
+  .theme-toggle .icon-moon{ display:none; }
+  :root[data-theme="dark"] .theme-toggle .icon-sun{ display:none; }
+  :root[data-theme="dark"] .theme-toggle .icon-moon{ display:block; }
 
   /* Main ocupa todo el espacio restante y centra el hero verticalmente:
      esto es lo que evita el scroll */
@@ -137,8 +197,9 @@
     font-weight:700;
     font-size: clamp(1.6rem, 3vw + 0.55rem, 2.6rem);
     line-height: 1.14;
-    color: var(--teal-900);
+    color: var(--heading);
     max-width: 15ch;
+    transition: color 0.25s ease;
   }
 
   .hero-sub{
@@ -177,7 +238,7 @@
     min-height:100%;
     min-width:0;
     text-decoration:none; color:inherit;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, background-color 0.25s ease;
   }
 
   .access-btn:focus-visible{
@@ -195,7 +256,7 @@
     }
     .access-btn:hover .access-arrow{
       background: var(--accent, var(--teal-900));
-      color:#fff;
+      color: var(--teal-900);
     }
     .access-btn:hover .access-arrow svg{ transform: translateX(2px); }
   }
@@ -205,8 +266,14 @@
     height: clamp(32px, 2.8vw, 38px);
     border-radius: 11px;
     background: var(--mint-bg);
+    color: var(--teal-900);
     display:flex; align-items:center; justify-content:center;
     margin-bottom: clamp(8px, 1.2vh, 12px);
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  :root[data-theme="dark"] .access-icon{
+    color: var(--mint);
   }
 
   .access-arrow{
@@ -235,7 +302,7 @@
     font-weight:700;
     font-size: clamp(0.88rem, 0.3vw + 0.8rem, 0.98rem);
     line-height:1.28;
-    color: var(--teal-900);
+    color: var(--heading);
     padding-right: 30px;
   }
 
@@ -250,20 +317,21 @@
     overflow: hidden;
   }
 
-  /* Variante ancha: para cuando hay un único acceso disponible, ocupa
-     las dos columnas de la grilla y vuelve a un layout horizontal */
+  /* Variante ancha: tarjeta de acceso a todo el ancho de la grilla (layout
+     horizontal). Se usa para cada acceso cuando se prefieren apilados en
+     vez de en cuadrícula 2x2 */
   .access-btn--wide{
     grid-column: 1 / -1;
     flex-direction: row;
     align-items: center;
-    gap: clamp(16px, 2.4vw, 24px);
-    padding: clamp(20px, 3vh, 30px) clamp(22px, 3vw, 32px);
+    gap: clamp(14px, 2vw, 22px);
+    padding: clamp(14px, 2vh, 22px) clamp(18px, 2.4vw, 26px);
   }
   .access-btn--wide .access-icon{
     margin-bottom: 0;
-    width: clamp(44px, 4vw, 56px);
-    height: clamp(44px, 4vw, 56px);
-    border-radius: 16px;
+    width: clamp(38px, 3.4vw, 48px);
+    height: clamp(38px, 3.4vw, 48px);
+    border-radius: 14px;
   }
   .access-btn--wide .access-body{
     display: flex;
@@ -271,34 +339,35 @@
     flex: 1 1 auto;
     min-width: 0;
   }
-  .access-btn--wide .access-tag{ font-size:0.74rem; }
+  .access-btn--wide .access-tag{ font-size:0.72rem; }
   .access-btn--wide .access-title{
-    font-size: clamp(1.05rem, 0.6vw + 0.9rem, 1.3rem);
+    font-size: clamp(0.98rem, 0.5vw + 0.85rem, 1.14rem);
     padding-right: 0;
   }
   .access-btn--wide .access-desc{
-    font-size: 0.92rem;
+    font-size: 0.86rem;
     -webkit-line-clamp: 1;
   }
   .access-btn--wide .access-arrow{
     position: static;
     flex-shrink: 0;
-    width: 44px; height: 44px;
+    width: 38px; height: 38px;
   }
-  .access-btn--wide .access-arrow svg{ width:18px; height:18px; }
+  .access-btn--wide .access-arrow svg{ width:16px; height:16px; }
 
   /* Footer — franja mínima, no compite por altura */
   footer{
     flex-shrink:0;
     border-top:1px solid var(--line);
     padding: 14px 0;
+    transition: border-color 0.25s ease;
   }
   footer .wrap{
     display:flex; justify-content:space-between; align-items:center;
     flex-wrap:wrap; gap:8px;
   }
   footer p{ font-size:0.78rem; color: var(--muted); }
-  footer p strong{ color: var(--teal-900); font-weight:700; }
+  footer p strong{ color: var(--heading); font-weight:700; }
 
   /* ===== Tableta ===== */
   @media (max-width:1024px) and (min-width:761px){
@@ -372,7 +441,13 @@
         <div class="sub">Grupo INS · Adopción de IA</div>
       </div>
     </div>
-    <span class="badge-ins">Panel interno</span>
+    <span class="topbar-actions">
+      <button type="button" class="theme-toggle" id="themeToggle" aria-pressed="false" aria-label="Activar modo oscuro">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5V5M12 19V21.5M4.2 4.2L6 6M18 18L19.8 19.8M2.5 12H5M19 12H21.5M4.2 19.8L6 18M18 6L19.8 4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4 6.8 6.8 0 0 0 20 14.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="badge-ins">Panel interno</span>
+    </span>
   </div>
 </header>
 
@@ -393,16 +468,33 @@
       <nav class="access" aria-labelledby="hero-title">
         <p class="access-label">Accesos disponibles</p>
 
-        <a class="access-btn access-btn--wide" style="--accent: var(--mint);" href="cpremium.html" target="_blank" rel="noopener noreferrer" aria-label="Abrir Uso de Licencias de Copilot Premium, corte 9 de julio 2026 (se abre en una pestaña nueva)">
+        <a class="access-btn access-btn--wide" style="--accent: var(--mint);" href="https://white-bush-04d665d0f.7.azurestaticapps.net/cpremium.html" target="_blank" rel="noopener noreferrer" aria-label="Abrir Uso de Licencias de Copilot Premium, corte 9 de julio 2026 (se abre en una pestaña nueva)">
           <span class="access-icon" aria-hidden="true">
             <svg width="22" height="22" viewBox="0 0 26 26" fill="none">
-              <path d="M13 3.5L16.2 9.9L23 11L18 15.9L19.2 22.7L13 19.4L6.8 22.7L8 15.9L3 11L9.8 9.9L13 3.5Z" stroke="#064350" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M13 3.5L16.2 9.9L23 11L18 15.9L19.2 22.7L13 19.4L6.8 22.7L8 15.9L3 11L9.8 9.9L13 3.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
             </svg>
           </span>
           <span class="access-body">
             <span class="access-tag" aria-hidden="true">Licencias</span>
             <span class="access-title">Uso de Licencias de Copilot Premium</span>
             <span class="access-desc">Dashboard de adopción y actividad de licencias, corte 9 de julio 2026.</span>
+          </span>
+          <span class="access-arrow" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        </a>
+
+        <a class="access-btn access-btn--wide" style="--accent: var(--teal-700);" href="https://ashy-field-09de0310f.7.azurestaticapps.net/copilotbasico.html" target="_blank" rel="noopener noreferrer" aria-label="Abrir Uso de Copilot Básico (se abre en una pestaña nueva)">
+          <span class="access-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 26 26" fill="none">
+              <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H19.5A2.5 2.5 0 0 1 22 6.5V15A2.5 2.5 0 0 1 19.5 17.5H10L5.5 21.5V17.5H6.5A2.5 2.5 0 0 1 4 15V6.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M8.5 9.5H17.5M8.5 13H14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="access-body">
+            <span class="access-tag" aria-hidden="true">Copilot Chat</span>
+            <span class="access-title">Uso de Copilot Básico</span>
+            <span class="access-desc">Adopción y actividad de Copilot Chat (EDP) en el tenant de Grupo INS.</span>
           </span>
           <span class="access-arrow" aria-hidden="true">
             <svg viewBox="0 0 16 16" fill="none"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -417,9 +509,44 @@
 <footer>
   <div class="wrap">
     <p><strong>Torre de Control</strong> — Copilot · Grupo INS</p>
-    <p>El tablero se abre en una pestaña nueva</p>
+    <p>Los tableros se abren en una pestaña nueva</p>
   </div>
 </footer>
+
+<script>
+  (function(){
+    var root = document.documentElement;
+    var toggle = document.getElementById('themeToggle');
+    var metaTheme = document.querySelector('meta[name="theme-color"]');
+    var COLOR_LIGHT = '#064350';
+    var COLOR_DARK = '#0B1520';
+
+    function applyTheme(isDark){
+      root.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      toggle.setAttribute('aria-pressed', String(isDark));
+      toggle.setAttribute('aria-label', isDark ? 'Activar modo claro' : 'Activar modo oscuro');
+      if (metaTheme) metaTheme.setAttribute('content', isDark ? COLOR_DARK : COLOR_LIGHT);
+    }
+
+    // Estado inicial: preferencia del sistema operativo/navegador.
+    // No se guarda en localStorage a propósito (cada carga respeta el modo del equipo).
+    var mql = window.matchMedia('(prefers-color-scheme: dark)');
+    applyTheme(mql.matches);
+
+    // Si el sistema cambia de tema mientras la página está abierta, seguirlo,
+    // salvo que la persona ya haya elegido manualmente en esta sesión.
+    var manualOverride = false;
+    mql.addEventListener('change', function(e){
+      if (!manualOverride) applyTheme(e.matches);
+    });
+
+    toggle.addEventListener('click', function(){
+      manualOverride = true;
+      var isDark = root.getAttribute('data-theme') === 'dark';
+      applyTheme(!isDark);
+    });
+  })();
+</script>
 
 </body>
 </html>
